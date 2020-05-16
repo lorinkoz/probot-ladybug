@@ -930,7 +930,7 @@ body-parser@1.19.0:
     raw-body "2.4.0"
     type-is "~1.6.17"
 
-bottleneck@^2.15.3:
+bottleneck@^2.0.1, bottleneck@^2.15.3:
   version "2.19.5"
   resolved "https://registry.yarnpkg.com/bottleneck/-/bottleneck-2.19.5.tgz#5df0b90f59fd47656ebe63c78a98419205cadd91"
   integrity sha512-VHiNCbI1lKdl44tGrhNfU3lup0Tj/ZBMJB5/2ZbNXRCPuRCO7ed2mgcK4r17y+KB2EfuYuRaVlwNbAeaWGSpbw==
@@ -3737,7 +3737,7 @@ mkdirp@^0.5.1, mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.5"
 
-moment@^2.10.6:
+moment@^2.10.6, moment@^2.25.3:
   version "2.25.3"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.25.3.tgz#252ff41319cf41e47761a1a88cab30edfe9808c0"
   integrity sha512-PuYv0PHxZvzc15Sp8ybUCoQ+xpyPWvjOuK72a5ovzp2LI32rJXOiIfyoFoYvG3s6EwwrdkMyWuRiEHSZRLJNdg==
@@ -4324,6 +4324,13 @@ pretty-format@^24.9.0:
     ansi-regex "^4.0.0"
     ansi-styles "^3.2.0"
     react-is "^16.8.4"
+
+probot-scheduler@^1.1.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/probot-scheduler/-/probot-scheduler-1.2.0.tgz#5aba76e589a214934e9db4c39368af592f4dc8b7"
+  integrity sha512-MCIH7erSh+/UppWeArexMh75+8JOPT5j8ykIDSy8CLFyM1DCGhfCLIjTB6b8INEh5eoTNjLmOOK5q/uby2sC1w==
+  dependencies:
+    bottleneck "^2.0.1"
 
 probot@^9.5.3:
   version "9.11.3"
