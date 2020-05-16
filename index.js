@@ -5,7 +5,7 @@ const configPath = "entomologist.yml",
   checkInterval = 5 * 60 * 1000,
   defaultConfig = {
     labels: {
-      unconfirmed: "Status: Requires confirmation",
+      unconfirmed: "Status: Needs reproducing",
       confirmed: "Status: Confirmed",
       duplicated: "Status: Duplicated",
     },
@@ -13,10 +13,6 @@ const configPath = "entomologist.yml",
       markUnconfirmed: 5, // minutes
     },
   };
-
-async function configFromContext(context) {
-  return await context.config(configPath, { ...defaultConfig });
-}
 
 module.exports = (app) => {
   app.log("Entomologist on duty!");
@@ -26,7 +22,7 @@ module.exports = (app) => {
 
   // Periodic housekeeping
   app.on("schedule.repository", async (context) => {
-    const config = configFromContext(context);
+    const config = await context.config(configPath, defaultConfig);
     const { owner, repo } = context.repo();
     const result = await context.github.search.issues({
       q: `no:label" repo:${owner}/${repo}`,
@@ -52,23 +48,24 @@ module.exports = (app) => {
 
   // Removing stale labels
   app.on("issues.labeled", async (context) => {
-    const config = configFromContext(context);
-    if (context.issue.label == config.labels.confirmed) {
+    const config = await context.config(configPath, defaultConfig);
+    app.log(`Checking labeled issue #${context.payload.issue.number}.`);
+    if (context.payload.label.name == config.labels.confirmed) {
       app.log(
-        `Removing "${config.labels.unconfirmed}" from labels on issue #${context.issue.number}.`
+        `Removing "${config.labels.unconfirmed}" from labels on issue #${context.payload.issue.number}.`
       );
-      context.github.issues.removeLabels(
+      context.github.issues.removeLabel(
         context.issue({
-          labels: [config.labels.unconfirmed],
+          name: config.labels.unconfirmed,
         })
       );
-    } else if (context.issue.label == config.labels.unconfirmed) {
+    } else if (context.payload.label.name == config.labels.unconfirmed) {
       app.log(
-        `Removing "${config.labels.confirmed}" from labels on issue #${context.issue.number}.`
+        `Removing "${config.labels.confirmed}" from labels on issue #${context.payload.issue.number}.`
       );
-      context.github.issues.removeLabels(
+      context.github.issues.removeLabel(
         context.issue({
-          labels: [config.labels.confirmed],
+          name: config.labels.confirmed,
         })
       );
     }
