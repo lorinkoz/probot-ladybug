@@ -2,6 +2,18 @@
 
 > A GitHub App built with [Probot](https://github.com/probot/probot) that Probot App to triage bug reports
 
+Configuration is expected in `.github/ladybug.yml`. This is the default configuration:
+
+```yml
+labels: # Labels to track status of issues
+  confirmed: "Status: Confirmed"
+  duplicated: "Status: Duplicated"
+  unconfirmed: "Status: Needs reproducing"
+timeouts:
+  unlabeled: 1 # 1 hour to label unlabeled issues as unconfirmed
+  unassigned: 10 # 10 hours to comment on unassigned issues
+```
+
 ## Setup
 
 ```sh
