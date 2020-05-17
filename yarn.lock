@@ -4325,10 +4325,10 @@ pretty-format@^24.9.0:
     ansi-styles "^3.2.0"
     react-is "^16.8.4"
 
-probot-scheduler@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/probot-scheduler/-/probot-scheduler-1.2.0.tgz#5aba76e589a214934e9db4c39368af592f4dc8b7"
-  integrity sha512-MCIH7erSh+/UppWeArexMh75+8JOPT5j8ykIDSy8CLFyM1DCGhfCLIjTB6b8INEh5eoTNjLmOOK5q/uby2sC1w==
+probot-scheduler@^2.0.0-beta.1:
+  version "2.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/probot-scheduler/-/probot-scheduler-2.0.0-beta.1.tgz#d1330c54430c750aa1c1ab96faecee62eb60549f"
+  integrity sha512-s22q0+Y+OzdV1f/i0wJw3QkgFSNV5glEBkB7C3aeV1jO3R6J02WqcDGjmJXlRz6XHb8eW9Rg9B9NLHfGR1GJpg==
   dependencies:
     bottleneck "^2.0.1"
 
