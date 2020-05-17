@@ -103,12 +103,12 @@ module.exports = (app) => {
 
   // Removes peer labels
   async function removePeerLabels(context) {
-    const peerRegex = /^(.*):/,
+    const peerRegex = /^(.+:)/,
       { label, issue } = context.payload,
       match = label.name.match(peerRegex);
 
     if (match) {
-      const labels = issue.labels.filter((x) => !x.name.match(peerRegex)).map((x) => x.name);
+      const labels = issue.labels.filter((x) => !x.name.startsWith(match[1])).map((x) => x.name);
       if (!labels.includes(label.name)) {
         labels.push(label.name);
       }
