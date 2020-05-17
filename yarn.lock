@@ -4325,6 +4325,11 @@ pretty-format@^24.9.0:
     ansi-styles "^3.2.0"
     react-is "^16.8.4"
 
+probot-metadata@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/probot-metadata/-/probot-metadata-1.0.1.tgz#13308dfed6a1f52eb692d5e4f55d500ec6b3fd28"
+  integrity sha512-wpxBFHJMGd2xn18Bb+lKBZKCJ2/jboa8S8rKj5p5jsi6T3KRQPc54GLTrbSBMoSjbpGZnXwf9yUmJEKDc/w4+w==
+
 probot-scheduler@^2.0.0-beta.1:
   version "2.0.0-beta.1"
   resolved "https://registry.yarnpkg.com/probot-scheduler/-/probot-scheduler-2.0.0-beta.1.tgz#d1330c54430c750aa1c1ab96faecee62eb60549f"
