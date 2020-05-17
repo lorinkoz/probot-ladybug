@@ -108,7 +108,7 @@ module.exports = (app) => {
       match = label.name.match(peerRegex);
 
     if (match) {
-      const labels = issue.labels.filter((x) => !x.name.match(peerRegex));
+      const labels = issue.labels.filter((x) => !x.name.match(peerRegex)).map((x) => x.name);
       if (!labels.includes(label.name)) {
         labels.push(label.name);
       }
