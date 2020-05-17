@@ -2,6 +2,14 @@
 
 > A GitHub App built with [Probot](https://github.com/probot/probot) to triage bug reports
 
+This app is capable of:
+
+- Label your unlabelled issues after some time of creation.
+- Comment on your unassigned issues after some time of creation.
+- Follow up on your open issues if they haven't been updated for some time.
+- Track duplicated issues and close them when the referred issue is closed. Reopen them if the referred issue is reopened.
+- Remove peer labels when a label is assigned (peer labels are those that begin with a common prefix like `Something:`, the colon is important)
+
 Configuration is expected in `.github/ladybug.yml`. This is the default configuration:
 
 ```yml
