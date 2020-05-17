@@ -1,13 +1,13 @@
 {
-  "name": "entomologist",
+  "name": "probot-ladybug",
   "version": "1.0.0",
   "private": true,
   "description": "Probot App to triage bug reports",
   "author": "Lorenzo Peña <lorinkoz@gmail.com>",
   "license": "ISC",
-  "repository": "https://github.com/lorinkoz/entomologist.git",
-  "homepage": "https://github.com/lorinkoz/entomologist",
-  "bugs": "https://github.com/lorinkoz/entomologist/issues",
+  "repository": "https://github.com/lorinkoz/probot-ladybug.git",
+  "homepage": "https://github.com/lorinkoz/probot-ladybug",
+  "bugs": "https://github.com/lorinkoz/probot-ladybug/issues",
   "keywords": [
     "probot",
     "github",

@@ -1,6 +1,6 @@
-name: Probot Entomologist
+name: Probot Ladybug
 description: Probot App to triage bug reports
-url: https://github.com/lorinkoz/entomologist.git
+url: https://github.com/lorinkoz/probot-ladybug.git
 default_events:
   - issue_comment
   - issues

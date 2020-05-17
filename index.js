@@ -1,7 +1,7 @@
 const createScheduler = require("probot-scheduler");
 const moment = require("moment");
 
-const configPath = "entomologist.yml",
+const configPath = "ladybug.yml",
   checkInterval = 5 * 60 * 1000,
   defaultConfig = {
     labels: {
@@ -15,7 +15,7 @@ const configPath = "entomologist.yml",
   };
 
 module.exports = (app) => {
-  app.log("Entomologist on duty!");
+  app.log("Ladybug on duty!");
   createScheduler(app, {
     interval: checkInterval,
   });
