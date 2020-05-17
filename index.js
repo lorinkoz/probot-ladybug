@@ -10,8 +10,8 @@ const configPath = "ladybug.yml",
       duplicated: "Status: Duplicated",
     },
     timeouts: {
-      unlabeled: 5, // minutes
-      unassigned: 10 * 60, // minutes (10 hours)
+      unlabeled: 1,
+      unassigned: 10,
     },
   };
 
@@ -63,9 +63,8 @@ module.exports = (app) => {
       searchResults.data.items.map(async (issue) => {
         issue = context.repo(issue);
         const unlabeled =
-            moment(issue.created_at).add(config.timeouts.unlabeled, "minutes") < moment() && !issue.labels.length,
-          unassigned =
-            moment(issue.created_at).add(config.timeouts.unassigned, "minutes") < moment() && !issue.assignee;
+            moment(issue.created_at).add(config.timeouts.unlabeled, "hours") < moment() && !issue.labels.length,
+          unassigned = moment(issue.created_at).add(config.timeouts.unassigned, "hours") < moment() && !issue.assignee;
 
         if (unlabeled) {
           declareUnconfirmed(issue, context);
