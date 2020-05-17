@@ -10,8 +10,9 @@ labels: # Labels to track status of issues
   duplicated: "Status: Duplicated"
   unconfirmed: "Status: Needs reproducing"
 timeouts:
+  unchimed: 10 # 10 hours to comment on issues with no comments and no assignees
+  unfollowed: 48 # 48 hours to follow up on issues without modifications
   unlabeled: 1 # 1 hour to label unlabeled issues as unconfirmed
-  unassigned: 10 # 10 hours to comment on unassigned issues
 ```
 
 ## Setup
