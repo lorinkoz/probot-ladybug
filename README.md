@@ -1,6 +1,6 @@
 # Probot Ladybug
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that Probot App to triage bug reports
+> A GitHub App built with [Probot](https://github.com/probot/probot) to triage bug reports
 
 Configuration is expected in `.github/ladybug.yml`. This is the default configuration:
 
