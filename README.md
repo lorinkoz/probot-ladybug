@@ -60,8 +60,8 @@ These are the available conditions for your rules:
 | ---------------- | ---------------------------------------------------------- |
 | `if_type`        | `issue` or `pr`                                            |
 | `if_state`       | `open` or `closed`                                         |
-| `if_created`     | any valid parameter for `moment().subtract(...)`           |
-| `if_updated`     | any valid parameter for `moment().subtract(...)`           |
+| `if_created`     | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
+| `if_updated`     | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
 | `if_label`       | label or array of labels or `no`                           |
 | `if_no_label`    | label or array of labels or `no` (to exclude)              |
 | `if_assignee`    | any username or `no`                                       |
