@@ -70,158 +70,179 @@ export = (app: Application) => {
       config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig;
 
     for (let checkName in config.scheduled_checks) {
-      const check = (config.scheduled_checks as ScheduledChecksConfig)[checkName];
       app.log(`Processing task ${checkName}.`);
-
       functions.push(async () => {
-        const { owner, repo } = context.repo(),
-          chunks: string[] = [`repo:${owner}/${repo}`];
+        const q = await buildCheckQuery(checkName, context),
+          executor = await buildCheckExecutor(checkName, context);
 
-        if (check.if_type) {
-          chunks.push(`type:${check.if_type}`);
-        }
-        if (check.if_state) {
-          chunks.push(`state:${check.if_state}`);
-        }
-        if (check.if_created) {
-          chunks.push(
-            `created:<${moment()
-              .subtract(...check.if_created.split(" "))
-              .format(moment.defaultFormatUtc)}`
-          );
-        }
-        if (check.if_updated) {
-          chunks.push(
-            `updated:<${moment()
-              .subtract(...check.if_updated.split(" "))
-              .format(moment.defaultFormatUtc)}`
-          );
-        }
-        if (check.if_label) {
-          const labels = Array.isArray(check.if_label) ? check.if_label : [check.if_label];
-          for (let label of labels) {
-            chunks.push(label === "no" ? `no:label` : `label:"${label}"`);
-          }
-        }
-        if (check.if_no_label) {
-          const labels = Array.isArray(check.if_no_label) ? check.if_no_label : [check.if_no_label];
-          for (let label of labels) {
-            chunks.push(label === "no" ? `-no:label` : `-label:"${label}"`);
-          }
-        }
-        if (check.if_assignee) {
-          chunks.push(check.if_assignee == "no" ? `no:assignee` : `assignee:${check.if_assignee}`);
-        }
-        if (typeof check.if_comments === "number") {
-          chunks.push(`comments:<=${check.if_comments}`);
-        }
-        if (check.if_review) {
-          chunks.push(`review:${check.if_review}`);
-        }
-        if (check.if_reviewed_by) {
-          chunks.push(`reviewed-by:${check.if_reviewed_by}`);
-        }
+        if (q && executor) {
+          const searchResults = await context.github.search.issuesAndPullRequests({ q });
 
-        const q = chunks.join(" "),
-          searchResults = await context.github.search.issuesAndPullRequests({ q });
-        app.log(`Query: ${q} -> [${searchResults.data.items.map((x) => x.number).join(", ")}].`);
-
-        await Promise.all(
-          searchResults.data.items.map(async (issue) => {
-            if (check.remove_labels) {
-              const labels = issue.labels.map((x) => x.name),
-                targetLabels = Array.isArray(check.remove_labels) ? check.remove_labels : [check.remove_labels];
-              for (let label of targetLabels) {
-                if (!labels.includes(label)) {
-                  labels.push(label);
-                }
-              }
-              await context.github.issues.replaceLabels({
-                owner,
-                repo,
-                issue_number: issue.number,
-                labels: labels,
-              });
-            }
-            if (check.add_labels) {
-              await context.github.issues.addLabels({
-                owner,
-                repo,
-                issue_number: issue.number,
-                labels: Array.isArray(check.add_labels) ? check.add_labels : [check.add_labels],
-              });
-            }
-            if (check.replace_labels) {
-              await context.github.issues.replaceLabels({
-                owner,
-                repo,
-                issue_number: issue.number,
-                labels: Array.isArray(check.replace_labels) ? check.replace_labels : [check.replace_labels],
-              });
-            }
-            if (check.comment) {
-              const replacements = {
-                "${AUTHOR}": issue.user.login,
-                "${ASSIGNEE}": (issue.assignee as any)?.login || "", // assignee is considered null always, why?
-              };
-              let commentBody = check.comment;
-              for (let placeholder in replacements) {
-                commentBody = commentBody.split(placeholder).join(replacements[placeholder]);
-              }
-
-              await context.github.issues.createComment({
-                owner,
-                repo,
-                issue_number: issue.number,
-                body: commentBody,
-              });
-            }
-            if (check.set_state) {
-              await context.github.issues.update({
-                owner,
-                repo,
-                issue_number: issue.number,
-                state: check.set_state,
-              });
-            }
-            if (check.set_locked) {
-              if (typeof check.set_locked === "boolean") {
-                await context.github.issues.unlock({
-                  owner,
-                  repo,
-                  issue_number: issue.number,
-                });
-              } else {
-                await context.github.issues.lock({
-                  owner,
-                  repo,
-                  issue_number: issue.number,
-                  lock_reason: check.set_locked,
-                });
-              }
-            }
-            if (check.remove_assignees) {
-              await context.github.issues.removeAssignees({
-                owner,
-                repo,
-                issue_number: issue.number,
-                assignees: Array.isArray(check.remove_assignees) ? check.remove_assignees : [check.remove_assignees],
-              });
-            }
-            if (check.add_assignees) {
-              await context.github.issues.addAssignees({
-                owner,
-                repo,
-                issue_number: issue.number,
-                assignees: Array.isArray(check.add_assignees) ? check.add_assignees : [check.add_assignees],
-              });
-            }
-          })
-        );
+          app.log(`Query: ${q} -> [${searchResults.data.items.map((x) => x.number).join(", ")}].`);
+          await Promise.all(searchResults.data.items.map(executor));
+        }
       });
     }
 
     await Promise.all(functions.map((x) => x()));
+  }
+
+  // Builds query for schedule task
+  async function buildCheckQuery(checkName, context) {
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
+      { owner, repo } = context.repo(),
+      chunks: string[] = [`repo:${owner}/${repo}`];
+
+    if (config.scheduled_checks?.[checkName]) {
+      const check = (config.scheduled_checks as ScheduledChecksConfig)[checkName];
+
+      if (check.if_type) {
+        chunks.push(`type:${check.if_type}`);
+      }
+      if (check.if_state) {
+        chunks.push(`state:${check.if_state}`);
+      }
+      if (check.if_created) {
+        chunks.push(
+          `created:<${moment()
+            .subtract(...check.if_created.split(" "))
+            .format(moment.defaultFormatUtc)}`
+        );
+      }
+      if (check.if_updated) {
+        chunks.push(
+          `updated:<${moment()
+            .subtract(...check.if_updated.split(" "))
+            .format(moment.defaultFormatUtc)}`
+        );
+      }
+      if (check.if_label) {
+        const labels = Array.isArray(check.if_label) ? check.if_label : [check.if_label];
+        for (let label of labels) {
+          chunks.push(label === "no" ? `no:label` : `label:"${label}"`);
+        }
+      }
+      if (check.if_no_label) {
+        const labels = Array.isArray(check.if_no_label) ? check.if_no_label : [check.if_no_label];
+        for (let label of labels) {
+          chunks.push(label === "no" ? `-no:label` : `-label:"${label}"`);
+        }
+      }
+      if (check.if_assignee) {
+        chunks.push(check.if_assignee == "no" ? `no:assignee` : `assignee:${check.if_assignee}`);
+      }
+      if (typeof check.if_comments === "number") {
+        chunks.push(`comments:<=${check.if_comments}`);
+      }
+      if (check.if_review) {
+        chunks.push(`review:${check.if_review}`);
+      }
+      if (check.if_reviewed_by) {
+        chunks.push(`reviewed-by:${check.if_reviewed_by}`);
+      }
+      return chunks.join(" ");
+    }
+    return null;
+  }
+
+  async function buildCheckExecutor(checkName, context) {
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
+      { owner, repo } = context.repo();
+
+    if (config.scheduled_checks?.[checkName]) {
+      const check = (config.scheduled_checks as ScheduledChecksConfig)[checkName];
+      return async (issue) => {
+        if (check.remove_labels) {
+          const labels = issue.labels.map((x) => x.name),
+            targetLabels = Array.isArray(check.remove_labels) ? check.remove_labels : [check.remove_labels];
+          for (let label of targetLabels) {
+            if (!labels.includes(label)) {
+              labels.push(label);
+            }
+          }
+          await context.github.issues.replaceLabels({
+            owner,
+            repo,
+            issue_number: issue.number,
+            labels: labels,
+          });
+        }
+        if (check.add_labels) {
+          await context.github.issues.addLabels({
+            owner,
+            repo,
+            issue_number: issue.number,
+            labels: Array.isArray(check.add_labels) ? check.add_labels : [check.add_labels],
+          });
+        }
+        if (check.replace_labels) {
+          await context.github.issues.replaceLabels({
+            owner,
+            repo,
+            issue_number: issue.number,
+            labels: Array.isArray(check.replace_labels) ? check.replace_labels : [check.replace_labels],
+          });
+        }
+        if (check.comment) {
+          const replacements = {
+            "${AUTHOR}": issue.user.login,
+            "${ASSIGNEE}": (issue.assignee as any)?.login || "", // assignee is considered null always, why?
+          };
+          let commentBody = check.comment;
+          for (let placeholder in replacements) {
+            commentBody = commentBody.split(placeholder).join(replacements[placeholder]);
+          }
+
+          await context.github.issues.createComment({
+            owner,
+            repo,
+            issue_number: issue.number,
+            body: commentBody,
+          });
+        }
+        if (check.set_state) {
+          await context.github.issues.update({
+            owner,
+            repo,
+            issue_number: issue.number,
+            state: check.set_state,
+          });
+        }
+        if (check.set_locked) {
+          if (typeof check.set_locked === "boolean") {
+            await context.github.issues.unlock({
+              owner,
+              repo,
+              issue_number: issue.number,
+            });
+          } else {
+            await context.github.issues.lock({
+              owner,
+              repo,
+              issue_number: issue.number,
+              lock_reason: check.set_locked,
+            });
+          }
+        }
+        if (check.remove_assignees) {
+          await context.github.issues.removeAssignees({
+            owner,
+            repo,
+            issue_number: issue.number,
+            assignees: Array.isArray(check.remove_assignees) ? check.remove_assignees : [check.remove_assignees],
+          });
+        }
+        if (check.add_assignees) {
+          await context.github.issues.addAssignees({
+            owner,
+            repo,
+            issue_number: issue.number,
+            assignees: Array.isArray(check.add_assignees) ? check.add_assignees : [check.add_assignees],
+          });
+        }
+      };
+    }
+    return null;
   }
 
   // Removes peer labels
