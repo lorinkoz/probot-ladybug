@@ -28,6 +28,8 @@ interface CheckConfig {
   if_no_label?: string | string[];
   if_assignee?: "no" | string;
   if_comments?: number;
+  if_review?: "none" | "required" | "approved" | "changes_requested";
+  if_reviewed_by?: string;
   add_labels?: string | string[];
   remove_labels?: string | string[];
   replace_labels?: string | string[];
@@ -112,6 +114,12 @@ export = (app: Application) => {
         }
         if (typeof check.if_comments === "number") {
           chunks.push(`comments:<=${check.if_comments}`);
+        }
+        if (check.if_review) {
+          chunks.push(`review:${check.if_review}`);
+        }
+        if (check.if_reviewed_by) {
+          chunks.push(`reviewed-by:${check.if_reviewed_by}`);
         }
 
         const q = chunks.join(" "),

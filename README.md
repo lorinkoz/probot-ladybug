@@ -56,16 +56,18 @@ scheduled_checks:
 
 These are the available conditions for your rules:
 
-| Condition     | Possible values                                  |
-| ------------- | ------------------------------------------------ |
-| `if_type`     | `issue` or `pr`                                  |
-| `if_state`    | `open` or `closed`                               |
-| `if_created`  | any valid parameter for `moment().subtract(...)` |
-| `if_updated`  | any valid parameter for `moment().subtract(...)` |
-| `if_label`    | label or array of labels or `no`                 |
-| `if_no_label` | label or array of labels or `no` (to exclude)    |
-| `if_assignee` | any username or `no`                             |
-| `if_comments` | number of comments (less or equal)               |
+| Condition        | Possible values                                            |
+| ---------------- | ---------------------------------------------------------- |
+| `if_type`        | `issue` or `pr`                                            |
+| `if_state`       | `open` or `closed`                                         |
+| `if_created`     | any valid parameter for `moment().subtract(...)`           |
+| `if_updated`     | any valid parameter for `moment().subtract(...)`           |
+| `if_label`       | label or array of labels or `no`                           |
+| `if_no_label`    | label or array of labels or `no` (to exclude)              |
+| `if_assignee`    | any username or `no`                                       |
+| `if_comments`    | number of comments (less or equal)                         |
+| `if_review`      | one of `none`, `required`, `approved`, `changes_requested` |
+| `if_reviewed_by` | any username                                               |
 
 And the available actions:
 
