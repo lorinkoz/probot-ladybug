@@ -97,8 +97,8 @@ Finally, the reasons to lock an issue are:
 ### Commands
 
 You can comment on any issue / PR with the command `/trytask`. It accepts space separated codenames of tasks to check.
-Without parameters, all tasks are considered.
-Ladybug will reply with the query she ran for every command, and whether or not she found the current issue / PR.
+Without parameters, all tasks will be checked.
+Ladybug will reply with the query she ran for every task, and whether or not she found the current issue / PR.
 
 ### Final word of advice from Ladybug
 
