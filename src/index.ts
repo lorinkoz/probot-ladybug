@@ -28,7 +28,9 @@ interface TaskConfig {
   if_label?: string | string[];
   if_no_label?: string | string[];
   if_author?: string;
+  if_not_author?: string;
   if_assignee?: "no" | string;
+  if_not_assigned?: string;
   if_comments?: number;
   if_review?: "none" | "required" | "approved" | "changes_requested";
   if_reviewed_by?: string;
@@ -184,8 +186,14 @@ export = (app: Application) => {
       if (task.if_author) {
         chunks.push(`author:${task.if_author}`);
       }
+      if (task.if_not_author) {
+        chunks.push(`-author:${task.if_not_author}`);
+      }
       if (task.if_assignee) {
         chunks.push(task.if_assignee == "no" ? `no:assignee` : `assignee:${task.if_assignee}`);
+      }
+      if (task.if_not_assigned) {
+        chunks.push(`-assignee:${task.if_not_assigned}`);
       }
       if (typeof task.if_comments === "number") {
         chunks.push(`comments:<=${task.if_comments}`);

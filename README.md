@@ -56,19 +56,21 @@ scheduled_tasks:
 
 These are the available conditions for your rules:
 
-| Condition        | Possible values                                            |
-| ---------------- | ---------------------------------------------------------- |
-| `if_type`        | `issue` or `pr`                                            |
-| `if_state`       | `open` or `closed`                                         |
-| `if_created`     | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
-| `if_updated`     | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
-| `if_label`       | label or array of labels or `no`                           |
-| `if_no_label`    | label or array of labels or `no` (to exclude)              |
-| `if_author`      | any username                                               |
-| `if_assignee`    | any username or `no`                                       |
-| `if_comments`    | number of comments (less or equal)                         |
-| `if_review`      | one of `none`, `required`, `approved`, `changes_requested` |
-| `if_reviewed_by` | any username                                               |
+| Condition         | Possible values                                            |
+| ----------------- | ---------------------------------------------------------- |
+| `if_type`         | `issue` or `pr`                                            |
+| `if_state`        | `open` or `closed`                                         |
+| `if_created`      | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
+| `if_updated`      | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
+| `if_label`        | label or array of labels or `no`                           |
+| `if_no_label`     | label or array of labels or `no` (to exclude)              |
+| `if_author`       | any username                                               |
+| `if_not_author`   | any username (to exclude)                                  |
+| `if_assignee`     | any username or `no`                                       |
+| `if_not_assigned` | any username (to exclude)                                  |
+| `if_comments`     | number of comments (less or equal)                         |
+| `if_review`       | one of `none`, `required`, `approved`, `changes_requested` |
+| `if_reviewed_by`  | any username                                               |
 
 And the available actions:
 
