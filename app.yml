@@ -1,5 +1,5 @@
 name: Probot Ladybug
-description: Probot App to triage bug reports
+description: Probot App to triage issues
 url: https://github.com/lorinkoz/probot-ladybug.git
 default_events:
   - issue_comment
