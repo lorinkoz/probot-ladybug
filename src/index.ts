@@ -69,7 +69,7 @@ export = (app: Application) => {
 
   commands(app, "trytask", async (context, command) => {
     const taskResults: TaskResult[] = [];
-    for (let taskName of command.arguments.split(/\s+/)) {
+    for (let taskName of command.arguments?.split(/\s+/) || []) {
       const q = await buildTaskQuery(taskName, context);
 
       if (q) {
@@ -84,17 +84,24 @@ export = (app: Application) => {
     const commentChunks: string[] = [];
     for (let tr of taskResults) {
       if (tr.result == "error") {
-        commentChunks.push(`\`${tr.task}\`: Task not found in configuration.`);
+        commentChunks.push(`-\`${tr.task}\` Task not found in configuration.`);
       } else {
         commentChunks.push(
-          `\`${tr.task}\`: Ran the query \`${tr.result.query}\` and ${tr.result.found ? "found it" : "didn't find it"}.`
+          `-\`${tr.task}\` Ran the query \`${tr.result.query}\` and ` +
+            `${tr.result.found ? "found it" : "didn't find it"}.`
         );
       }
     }
     if (commentChunks.length) {
       context.github.issues.createComment(
         context.issue({
-          body: commentChunks.join("\n\n"),
+          body: commentChunks.join("\n"),
+        })
+      );
+    } else {
+      context.github.issues.createComment(
+        context.issue({
+          body: "`/trytask` requires at least one task to execute.",
         })
       );
     }
