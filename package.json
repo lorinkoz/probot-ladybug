@@ -1,6 +1,6 @@
 {
   "name": "probot-ladybug",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Probot App to triage issues",
   "author": "Lorenzo Peña <lorinkoz@gmail.com>",
