@@ -100,13 +100,13 @@ export = (app: Application) => {
         if (check.if_label) {
           const labels = Array.isArray(check.if_label) ? check.if_label : [check.if_label];
           for (let label of labels) {
-            chunks.push(label === "no" ? `no:label` : `label:${label}`);
+            chunks.push(label === "no" ? `no:label` : `label:"${label}"`);
           }
         }
         if (check.if_no_label) {
           const labels = Array.isArray(check.if_no_label) ? check.if_no_label : [check.if_no_label];
           for (let label of labels) {
-            chunks.push(label === "no" ? `-no:label` : `-label:${label}`);
+            chunks.push(label === "no" ? `-no:label` : `-label:"${label}"`);
           }
         }
         if (check.if_assignee) {
@@ -124,7 +124,7 @@ export = (app: Application) => {
 
         const q = chunks.join(" "),
           searchResults = await context.github.search.issuesAndPullRequests({ q });
-        app.log(`Query: >>> ${q} <<< returned [${searchResults.data.items.map((x) => x.number).join(", ")}].`);
+        app.log(`Query: ${q} -> [${searchResults.data.items.map((x) => x.number).join(", ")}].`);
 
         await Promise.all(
           searchResults.data.items.map(async (issue) => {
