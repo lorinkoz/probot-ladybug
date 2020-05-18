@@ -24,7 +24,8 @@ interface CheckConfig {
   if_state?: "open" | "closed";
   if_created?: string;
   if_updated?: string;
-  if_label?: "no" | string;
+  if_label?: "no" | string | string[];
+  if_no_label?: string | string[];
   if_assignee?: "no" | string;
   if_comments?: number;
   add_labels?: string | string[];
@@ -95,12 +96,25 @@ export = (app: Application) => {
           );
         }
         if (check.if_label) {
-          chunks.push(check.if_label == "no" ? `no:label` : `label:${check.if_label}`);
+          if (check.if_label === "no") {
+            chunks.push(`no:label`);
+          } else {
+            const labels = Array.isArray(check.if_label) ? check.if_label : [check.if_label];
+            for (let label of labels) {
+              chunks.push(`label:${label}`);
+            }
+          }
+        }
+        if (check.if_no_label) {
+          const labels = Array.isArray(check.if_no_label) ? check.if_no_label : [check.if_no_label];
+          for (let label of labels) {
+            chunks.push(`-label:${label}`);
+          }
         }
         if (check.if_assignee) {
           chunks.push(check.if_assignee == "no" ? `no:assignee` : `assignee:${check.if_assignee}`);
         }
-        if (check.if_comments) {
+        if (typeof check.if_comments === "number") {
           chunks.push(`comments:<=${check.if_comments}`);
         }
 

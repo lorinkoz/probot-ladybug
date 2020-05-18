@@ -62,7 +62,8 @@ These are the available conditions for your rules:
 | `if_state`    | `open` or `closed`                               |
 | `if_created`  | any valid parameter for `moment().subtract(...)` |
 | `if_updated`  | any valid parameter for `moment().subtract(...)` |
-| `if_label`    | any label or `no`                                |
+| `if_label`    | label or array of labels or `no`                 |
+| `if_no_label` | label or array of labels to exclude              |
 | `if_assignee` | any username or `no`                             |
 | `if_comments` | number of comments (less or equal)               |
 
