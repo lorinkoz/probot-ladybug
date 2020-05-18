@@ -276,7 +276,7 @@ export = (app: Application) => {
         markDuplicate(match[1]);
       }
     } else if (issue.state == "open" && action == "edited") {
-      const matchBefore = changes.body && changes.body.from.match(dupRegex),
+      const matchBefore = changes.body?.from.match(dupRegex),
         matchAfter = comment.body.match(dupRegex);
       if (matchAfter) {
         markDuplicate(matchAfter[1]);
@@ -293,42 +293,44 @@ export = (app: Application) => {
 
   // Checks closed issue for chain closing
   async function checkChainClosing(context: Context) {
-    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
-      { issue } = context.payload,
-      { owner, repo } = context.repo(),
-      q =
-        `is:issue is:open ` +
-        `label:"${(config.duplicated_issues as DuplicatedIssuesConfig).label}" ` +
-        `repo:${owner}/${repo}`,
-      searchResults = await context.github.search.issuesAndPullRequests({ q });
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig;
+    if ("label" in (config.duplicated_issues as DuplicatedIssuesConfig)) {
+      const { issue } = context.payload,
+        { owner, repo } = context.repo(),
+        q =
+          `is:issue is:open ` +
+          `label:"${(config.duplicated_issues as DuplicatedIssuesConfig).label}" ` +
+          `repo:${owner}/${repo}`,
+        searchResults = await context.github.search.issuesAndPullRequests({ q });
 
-    const chainClosed = (
-      await Promise.all(
-        searchResults.data.items.map(async (otherIssue) => {
-          otherIssue = context.repo(otherIssue);
-          const duplicateOf = await metadata(context, otherIssue).get("duplicateOf");
+      const chainClosed = (
+        await Promise.all(
+          searchResults.data.items.map(async (otherIssue) => {
+            otherIssue = context.repo(otherIssue);
+            const duplicateOf = await metadata(context, otherIssue).get("duplicateOf");
 
-          if (duplicateOf && issue.number == parseInt(duplicateOf)) {
-            app.log(`Chain closing issue #${otherIssue.number}.`);
-            await context.github.issues.update({
-              owner,
-              repo,
-              issue_number: otherIssue.number,
-              state: "closed",
-            });
-            return `#${otherIssue.number}`;
-          }
-          return null;
-        })
-      )
-    ).filter((x) => x);
+            if (duplicateOf && issue.number == parseInt(duplicateOf)) {
+              app.log(`Chain closing issue #${otherIssue.number}.`);
+              await context.github.issues.update({
+                owner,
+                repo,
+                issue_number: otherIssue.number,
+                state: "closed",
+              });
+              return `#${otherIssue.number}`;
+            }
+            return null;
+          })
+        )
+      ).filter((x) => x);
 
-    if (chainClosed.length) {
-      await context.github.issues.createComment(
-        context.issue({
-          body: `Closed other issues that were marked as duplicates of this one: ${chainClosed.join(", ")}`,
-        })
-      );
+      if (chainClosed.length) {
+        await context.github.issues.createComment(
+          context.issue({
+            body: `Closed other issues that were marked as duplicates of this one: ${chainClosed.join(", ")}`,
+          })
+        );
+      }
     }
   }
 
