@@ -236,12 +236,12 @@ export = (app: Application) => {
 
     // Mark issue as duplicate
     async function markDuplicate(duplicateOf: number) {
-      if ("label" in (config.duplicated_issues as DuplicatedIssuesConfig)) {
+      if (!!config.duplicated_issues) {
         app.log(`Marking issue #${issue.number} as dup of #${duplicateOf}.`);
         await metadata(context).set("duplicateOf", duplicateOf);
         await context.github.issues.replaceLabels(
           context.issue({
-            labels: [(config.duplicated_issues as DuplicatedIssuesConfig).label],
+            labels: [config.duplicated_issues.label],
           })
         );
       }
@@ -249,12 +249,12 @@ export = (app: Application) => {
 
     // Unmark issue as duplicate
     async function unmarkDuplicate(duplicateOf: number) {
-      if ("label" in (config.duplicated_issues as DuplicatedIssuesConfig)) {
+      if (!!config.duplicated_issues) {
         app.log(`Unmarking issue #${issue.number} as dup of #${duplicateOf}.`);
         await metadata(context).set("duplicateOf", undefined);
         await context.github.issues.removeLabel(
           context.issue({
-            name: (config.duplicated_issues as DuplicatedIssuesConfig).label,
+            name: config.duplicated_issues.label,
           })
         );
       }

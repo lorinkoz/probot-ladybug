@@ -10,10 +10,10 @@ Ladybug has these superpowers:
 
 Ladybug responds to a configuration file located in `.github/ladybug.yml`.
 
-You can turn on/off the management of peer labels via:
+You can turn off the management of peer labels via:
 
 ```yml
-peer_labels: false # default is true
+peer_labels: false
 ```
 
 You can also control the management of duplicated issue via:
@@ -26,9 +26,12 @@ The default value for this setting is:
 
 ```yml
 duplicated_issues:
-  label: "Status: Duplicated" # Label that will be used to mark / control duplicated issues
-  chain_close: true # Whether to close duplicated issues in chain
-  chain_reopen: true # Whether to reopen duplicated issues in chain
+  # Label that will be used to mark / control duplicated issues (mandatory)
+  label: "Status: Duplicated"
+  # Whether to close duplicated issues in chain
+  chain_close: true
+  # Whether to reopen duplicated issues in chain
+  chain_reopen: true
 ```
 
 Finally, the rules for interacting with your issues can be configured through a set of conditions and actions.
