@@ -94,6 +94,12 @@ The leading `@` is NOT included in case you don't want to tag the user directly.
 Finally, the reasons to lock an issue are:
 `off-topic`, `too heated`, `resolved`, `spam`
 
+### Commands
+
+You can comment on any issue / PR with the command `/trytask`. It accepts space separated codenames of tasks to check.
+Without parameters, all tasks are considered.
+Ladybug will reply with the query she ran for every command, and whether or not she found the current issue / PR.
+
 ### Final word of advice from Ladybug
 
 The scheduled tasks are run every 5 minutes. Make sure you actions change the status of your issues in a way that the
