@@ -5,7 +5,7 @@
 Ladybug has these superpowers:
 
 - When you have peer labels (e.g. `Status: Reproducing`, `Status: Confirmed`) she removes the other peer labels when one of them is assigned.
-- If you mark an issue as duplicate of another, and don't close it, she will remember this and will chain close and chain reopen the duplicated issues when the reference issue is closed or reopened.
+- If you mark an issue as duplicate of another, she will remember this and will chain close and chain reopen the duplicated issues when the reference issue is closed or reopened.
 - You can configure rules for interacting with your issues. This is actually the superpower she's most proud of.
 
 Ladybug responds to a configuration file located in `.github/ladybug.yml`.
