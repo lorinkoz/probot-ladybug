@@ -6,7 +6,7 @@ import moment from "moment";
 interface AppConfig {
   peer_labels?: boolean;
   duplicated_issues?: false | DuplicatedIssuesConfig;
-  scheduled_checks?: ScheduledChecksConfig;
+  scheduled_tasks?: ScheduledTasksConfig;
 }
 
 interface DuplicatedIssuesConfig {
@@ -15,11 +15,11 @@ interface DuplicatedIssuesConfig {
   chain_reopen?: boolean;
 }
 
-interface ScheduledChecksConfig {
-  [propName: string]: CheckConfig;
+interface ScheduledTasksConfig {
+  [propName: string]: TaskConfig;
 }
 
-interface CheckConfig {
+interface TaskConfig {
   if_type?: "issue" | "pr";
   if_state?: "open" | "closed";
   if_created?: string;
@@ -69,11 +69,11 @@ export = (app: Application) => {
     const functions: Array<() => void> = [],
       config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig;
 
-    for (let checkName in config.scheduled_checks) {
-      app.log(`Processing task ${checkName}.`);
+    for (let taskName in config.scheduled_tasks) {
+      app.log(`Processing task ${taskName}.`);
       functions.push(async () => {
-        const q = await buildCheckQuery(checkName, context),
-          executor = await buildCheckExecutor(checkName, context);
+        const q = await buildTaskQuery(taskName, context),
+          executor = await buildTaskExecutor(taskName, context);
 
         if (q && executor) {
           const searchResults = await context.github.search.issuesAndPullRequests({ q });
@@ -88,73 +88,73 @@ export = (app: Application) => {
   }
 
   // Builds query for schedule task
-  async function buildCheckQuery(checkName, context) {
+  async function buildTaskQuery(taskName, context) {
     const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
       { owner, repo } = context.repo(),
       chunks: string[] = [`repo:${owner}/${repo}`];
 
-    if (config.scheduled_checks?.[checkName]) {
-      const check = (config.scheduled_checks as ScheduledChecksConfig)[checkName];
+    if (config.scheduled_tasks?.[taskName]) {
+      const task = (config.scheduled_tasks as ScheduledTasksConfig)[taskName];
 
-      if (check.if_type) {
-        chunks.push(`type:${check.if_type}`);
+      if (task.if_type) {
+        chunks.push(`type:${task.if_type}`);
       }
-      if (check.if_state) {
-        chunks.push(`state:${check.if_state}`);
+      if (task.if_state) {
+        chunks.push(`state:${task.if_state}`);
       }
-      if (check.if_created) {
+      if (task.if_created) {
         chunks.push(
           `created:<${moment()
-            .subtract(...check.if_created.split(" "))
+            .subtract(...task.if_created.split(" "))
             .format(moment.defaultFormatUtc)}`
         );
       }
-      if (check.if_updated) {
+      if (task.if_updated) {
         chunks.push(
           `updated:<${moment()
-            .subtract(...check.if_updated.split(" "))
+            .subtract(...task.if_updated.split(" "))
             .format(moment.defaultFormatUtc)}`
         );
       }
-      if (check.if_label) {
-        const labels = Array.isArray(check.if_label) ? check.if_label : [check.if_label];
+      if (task.if_label) {
+        const labels = Array.isArray(task.if_label) ? task.if_label : [task.if_label];
         for (let label of labels) {
           chunks.push(label === "no" ? `no:label` : `label:"${label}"`);
         }
       }
-      if (check.if_no_label) {
-        const labels = Array.isArray(check.if_no_label) ? check.if_no_label : [check.if_no_label];
+      if (task.if_no_label) {
+        const labels = Array.isArray(task.if_no_label) ? task.if_no_label : [task.if_no_label];
         for (let label of labels) {
           chunks.push(label === "no" ? `-no:label` : `-label:"${label}"`);
         }
       }
-      if (check.if_assignee) {
-        chunks.push(check.if_assignee == "no" ? `no:assignee` : `assignee:${check.if_assignee}`);
+      if (task.if_assignee) {
+        chunks.push(task.if_assignee == "no" ? `no:assignee` : `assignee:${task.if_assignee}`);
       }
-      if (typeof check.if_comments === "number") {
-        chunks.push(`comments:<=${check.if_comments}`);
+      if (typeof task.if_comments === "number") {
+        chunks.push(`comments:<=${task.if_comments}`);
       }
-      if (check.if_review) {
-        chunks.push(`review:${check.if_review}`);
+      if (task.if_review) {
+        chunks.push(`review:${task.if_review}`);
       }
-      if (check.if_reviewed_by) {
-        chunks.push(`reviewed-by:${check.if_reviewed_by}`);
+      if (task.if_reviewed_by) {
+        chunks.push(`reviewed-by:${task.if_reviewed_by}`);
       }
       return chunks.join(" ");
     }
     return null;
   }
 
-  async function buildCheckExecutor(checkName, context) {
+  async function buildTaskExecutor(taskName, context) {
     const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
       { owner, repo } = context.repo();
 
-    if (config.scheduled_checks?.[checkName]) {
-      const check = (config.scheduled_checks as ScheduledChecksConfig)[checkName];
+    if (config.scheduled_tasks?.[taskName]) {
+      const task = (config.scheduled_tasks as ScheduledTasksConfig)[taskName];
       return async (issue) => {
-        if (check.remove_labels) {
+        if (task.remove_labels) {
           const labels = issue.labels.map((x) => x.name),
-            targetLabels = Array.isArray(check.remove_labels) ? check.remove_labels : [check.remove_labels];
+            targetLabels = Array.isArray(task.remove_labels) ? task.remove_labels : [task.remove_labels];
           for (let label of targetLabels) {
             if (!labels.includes(label)) {
               labels.push(label);
@@ -167,28 +167,28 @@ export = (app: Application) => {
             labels: labels,
           });
         }
-        if (check.add_labels) {
+        if (task.add_labels) {
           await context.github.issues.addLabels({
             owner,
             repo,
             issue_number: issue.number,
-            labels: Array.isArray(check.add_labels) ? check.add_labels : [check.add_labels],
+            labels: Array.isArray(task.add_labels) ? task.add_labels : [task.add_labels],
           });
         }
-        if (check.replace_labels) {
+        if (task.replace_labels) {
           await context.github.issues.replaceLabels({
             owner,
             repo,
             issue_number: issue.number,
-            labels: Array.isArray(check.replace_labels) ? check.replace_labels : [check.replace_labels],
+            labels: Array.isArray(task.replace_labels) ? task.replace_labels : [task.replace_labels],
           });
         }
-        if (check.comment) {
+        if (task.comment) {
           const replacements = {
             "${AUTHOR}": issue.user.login,
             "${ASSIGNEE}": (issue.assignee as any)?.login || "", // assignee is considered null always, why?
           };
-          let commentBody = check.comment;
+          let commentBody = task.comment;
           for (let placeholder in replacements) {
             commentBody = commentBody.split(placeholder).join(replacements[placeholder]);
           }
@@ -200,16 +200,16 @@ export = (app: Application) => {
             body: commentBody,
           });
         }
-        if (check.set_state) {
+        if (task.set_state) {
           await context.github.issues.update({
             owner,
             repo,
             issue_number: issue.number,
-            state: check.set_state,
+            state: task.set_state,
           });
         }
-        if (check.set_locked) {
-          if (typeof check.set_locked === "boolean") {
+        if (task.set_locked) {
+          if (typeof task.set_locked === "boolean") {
             await context.github.issues.unlock({
               owner,
               repo,
@@ -220,24 +220,24 @@ export = (app: Application) => {
               owner,
               repo,
               issue_number: issue.number,
-              lock_reason: check.set_locked,
+              lock_reason: task.set_locked,
             });
           }
         }
-        if (check.remove_assignees) {
+        if (task.remove_assignees) {
           await context.github.issues.removeAssignees({
             owner,
             repo,
             issue_number: issue.number,
-            assignees: Array.isArray(check.remove_assignees) ? check.remove_assignees : [check.remove_assignees],
+            assignees: Array.isArray(task.remove_assignees) ? task.remove_assignees : [task.remove_assignees],
           });
         }
-        if (check.add_assignees) {
+        if (task.add_assignees) {
           await context.github.issues.addAssignees({
             owner,
             repo,
             issue_number: issue.number,
-            assignees: Array.isArray(check.add_assignees) ? check.add_assignees : [check.add_assignees],
+            assignees: Array.isArray(task.add_assignees) ? task.add_assignees : [task.add_assignees],
           });
         }
       };

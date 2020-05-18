@@ -38,7 +38,7 @@ Finally, the rules for interacting with your issues can be configured through a 
 Better to learn from an example:
 
 ```yml
-scheduled_checks:
+scheduled_tasks:
   label_unlabelled: # codename of the rule
     if_type: issue
     if_state: open
