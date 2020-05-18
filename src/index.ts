@@ -27,6 +27,7 @@ interface TaskConfig {
   if_updated?: string;
   if_label?: string | string[];
   if_no_label?: string | string[];
+  if_author?: string;
   if_assignee?: "no" | string;
   if_comments?: number;
   if_review?: "none" | "required" | "approved" | "changes_requested";
@@ -179,6 +180,9 @@ export = (app: Application) => {
         for (let label of labels) {
           chunks.push(label === "no" ? `-no:label` : `-label:"${label}"`);
         }
+      }
+      if (task.if_author) {
+        chunks.push(`author:${task.if_author}`);
       }
       if (task.if_assignee) {
         chunks.push(task.if_assignee == "no" ? `no:assignee` : `assignee:${task.if_assignee}`);

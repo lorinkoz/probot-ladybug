@@ -64,6 +64,7 @@ These are the available conditions for your rules:
 | `if_updated`     | e.g `"3 days"`, `"2 hours"`, `"1 month"`                   |
 | `if_label`       | label or array of labels or `no`                           |
 | `if_no_label`    | label or array of labels or `no` (to exclude)              |
+| `if_author`      | any username                                               |
 | `if_assignee`    | any username or `no`                                       |
 | `if_comments`    | number of comments (less or equal)                         |
 | `if_review`      | one of `none`, `required`, `approved`, `changes_requested` |
