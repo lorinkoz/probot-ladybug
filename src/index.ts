@@ -84,18 +84,17 @@ export = (app: Application) => {
     const commentChunks: string[] = [];
     for (let tr of taskResults) {
       if (tr.result == "error") {
-        commentChunks.push(`-\`${tr.task}\` Task not found in configuration.`);
+        commentChunks.push(`| \`${tr.task}\` | Not found in configuration | |`);
       } else {
         commentChunks.push(
-          `-\`${tr.task}\` Ran the query \`${tr.result.query}\` and ` +
-            `${tr.result.found ? "found it" : "didn't find it"}.`
+          `| \`${tr.task}\` | \`${tr.result.query}\` | ${tr.result.found ? ":heavy_check_mark:" : ":x:"} |`
         );
       }
     }
     if (commentChunks.length) {
       context.github.issues.createComment(
         context.issue({
-          body: commentChunks.join("\n"),
+          body: "| Task | Query | Found |\n" + "| - | - | - |\n" + commentChunks.join("\n"),
         })
       );
     } else {
