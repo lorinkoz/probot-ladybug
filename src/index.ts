@@ -68,8 +68,10 @@ export = (app: Application) => {
   });
 
   commands(app, "trytask", async (context, command) => {
-    const taskResults: TaskResult[] = [];
-    for (let taskName of command.arguments?.split(/\s+/) || []) {
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
+      targetTasks = command.arguments?.split(/\s+/) || Object.keys(config.scheduled_tasks || {}),
+      taskResults: TaskResult[] = [];
+    for (let taskName of targetTasks) {
       const q = await buildTaskQuery(taskName, context);
 
       if (q) {
@@ -100,7 +102,7 @@ export = (app: Application) => {
     } else {
       context.github.issues.createComment(
         context.issue({
-          body: "`/trytask` requires at least one task to execute.",
+          body: "`/trytask` couldn't find any scheduled task.",
         })
       );
     }
