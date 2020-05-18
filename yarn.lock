@@ -4606,6 +4606,11 @@ pretty-format@^25.2.1, pretty-format@^25.5.0:
     ansi-styles "^4.0.0"
     react-is "^16.12.0"
 
+probot-commands@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/probot-commands/-/probot-commands-1.1.0.tgz#da485f4d2d25bfd6ec194bf5dc21a80b51e6a303"
+  integrity sha512-7pl3RZjJ2/t3h4dy/xeodkdyx6/ZZSm5ywmuZ3rPL6K7wcvguTrOobTKb/2n2G6NNnxB3rrk4z0OdEAVV/d39A==
+
 probot-metadata@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/probot-metadata/-/probot-metadata-1.0.1.tgz#13308dfed6a1f52eb692d5e4f55d500ec6b3fd28"

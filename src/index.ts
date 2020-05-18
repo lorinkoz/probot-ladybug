@@ -1,6 +1,7 @@
 import { Application, Context } from "probot";
 import createScheduler from "probot-scheduler";
 import metadata from "probot-metadata";
+import commands from "probot-commands";
 import moment from "moment";
 
 interface AppConfig {
@@ -40,6 +41,16 @@ interface TaskConfig {
   remove_assignees?: string | string[];
 }
 
+interface TaskResult {
+  task: string;
+  result:
+    | "error"
+    | {
+        query: string;
+        found: boolean;
+      };
+}
+
 const configPath = "ladybug.yml";
 const defaultConfig: AppConfig = {
   peer_labels: true,
@@ -54,6 +65,39 @@ export = (app: Application) => {
   app.log("Ladybug on duty!");
   createScheduler(app, {
     interval: 5 * 60 * 1000, // 5 minutes
+  });
+
+  commands(app, "trytask", async (context, command) => {
+    const taskResults: TaskResult[] = [];
+    for (let taskName of command.arguments.split(/\s+/)) {
+      const q = await buildTaskQuery(taskName, context);
+
+      if (q) {
+        const searchResults = await context.github.search.issuesAndPullRequests({ q }),
+          found = searchResults.data.items.includes(context.payload.issue.number);
+        taskResults.push({ task: taskName, result: { found, query: q } });
+      } else {
+        taskResults.push({ task: taskName, result: "error" });
+      }
+    }
+
+    const commentChunks: string[] = [];
+    for (let tr of taskResults) {
+      if (tr.result == "error") {
+        commentChunks.push(`\`${tr.task}\`: Task not found in configuration.`);
+      } else {
+        commentChunks.push(
+          `\`${tr.task}\`: Ran the query \`${tr.result.query}\` and ${tr.result.found ? "found it" : "didn't find it"}.`
+        );
+      }
+    }
+    if (commentChunks.length) {
+      context.github.issues.createComment(
+        context.issue({
+          body: commentChunks.join("\n\n"),
+        })
+      );
+    }
   });
 
   app.on("schedule.repository", checkScheduledTasks);
