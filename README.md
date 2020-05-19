@@ -107,8 +107,8 @@ Ladybug will reply with the query she ran for every task, and whether or not she
 
 ### Final word of advice from Ladybug
 
-The scheduled tasks are run every 5 minutes. Make sure you actions change the status of your issues in a way that the
-same action won't kick in again in 5 minutes, otherwise, you will create an infinite loop.
+The scheduled tasks are run every 15 minutes. Make sure you actions change the status of your issues in a way that the
+same task won't kick in again in 15 minutes, otherwise, you will create an infinite loop.
 
 That's all! Enjoy!
 

@@ -69,7 +69,7 @@ const defaultConfig: AppConfig = {
 export = (app: Application) => {
   app.log("Ladybug on duty!");
   createScheduler(app, {
-    interval: 5 * 60 * 1000, // 5 minutes
+    interval: 15 * 60 * 1000, // 15 minutes
   });
 
   commands(app, "trytask", async (context, command) => {
