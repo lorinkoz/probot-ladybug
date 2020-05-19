@@ -34,6 +34,8 @@ interface TaskConfig {
   if_comments?: number;
   if_review?: "none" | "required" | "approved" | "changes_requested";
   if_reviewed_by?: string;
+  if_linked?: "issue" | "pr";
+  if_no_linked?: "issue" | "pr";
   add_labels?: string | string[];
   remove_labels?: string | string[];
   replace_labels?: string | string[];
@@ -203,6 +205,12 @@ export = (app: Application) => {
       }
       if (task.if_reviewed_by) {
         chunks.push(`reviewed-by:${task.if_reviewed_by}`);
+      }
+      if (task.if_linked) {
+        chunks.push(`linked:${task.if_linked}`);
+      }
+      if (task.if_no_linked) {
+        chunks.push(`-linked:${task.if_no_linked}`);
       }
       return chunks.join(" ");
     }

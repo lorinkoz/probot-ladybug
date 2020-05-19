@@ -71,6 +71,8 @@ These are the available conditions for your rules:
 | `if_comments`     | number of comments (less or equal)                         |
 | `if_review`       | one of `none`, `required`, `approved`, `changes_requested` |
 | `if_reviewed_by`  | any username                                               |
+| `if_linked`       | `issue` or `pr`                                            |
+| `if_no_linked`    | `issue` or `pr`                                            |
 
 And the available actions:
 
