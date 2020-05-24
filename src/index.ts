@@ -91,7 +91,7 @@ export = (app: Application) => {
 
       if (q) {
         const searchResults = await context.github.search.issuesAndPullRequests({ q }),
-          found = searchResults.data.items.map((x) => x.number).includes(context.payload.issue.number);
+          found = searchResults.data.items.some((x) => x.number == context.payload.issue.number);
         taskResults.push({ task: taskName, result: { found, query: q } });
       } else {
         taskResults.push({ task: taskName, result: "error" });
