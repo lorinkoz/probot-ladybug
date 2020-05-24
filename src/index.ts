@@ -8,6 +8,7 @@ interface AppConfig {
   peer_labels?: boolean;
   duplicated_issues?: false | DuplicatedIssuesConfig;
   scheduled_tasks?: ScheduledTasksConfig;
+  mark_actions?: MarkConfig;
 }
 
 interface DuplicatedIssuesConfig {
@@ -18,6 +19,10 @@ interface DuplicatedIssuesConfig {
 
 interface ScheduledTasksConfig {
   [propName: string]: TaskConfig;
+}
+
+interface MarkConfig {
+  [propName: string]: TaskActionSet;
 }
 
 interface TaskQuery {
@@ -113,6 +118,33 @@ export = (app: Application) => {
       context.github.issues.createComment(
         context.issue({
           body: "`/trytask` couldn't find any scheduled task.",
+        })
+      );
+    }
+  });
+
+  commands(app, "mark", async (context, command) => {
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
+      markActions = config.mark_actions || {},
+      targetMarks = command.arguments?.split(/\s+/);
+
+    const errorChunks: string[] = [];
+    for (let markName of targetMarks) {
+      const actionSet = markActions[markName];
+      if (!actionSet) {
+        errorChunks.push(markName);
+      } else {
+        const executor = await buildTaskExecutor(actionSet, context);
+        if (executor) {
+          executor(context.issue);
+        }
+      }
+    }
+
+    if (errorChunks.length) {
+      context.github.issues.createComment(
+        context.issue({
+          body: `\`/mark\` couldn't find these keys in configuration: ${errorChunks.map((x) => `\`${x}\``).join(", ")}`,
         })
       );
     }

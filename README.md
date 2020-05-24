@@ -7,6 +7,7 @@ Ladybug has these superpowers:
 - When you have peer labels (e.g. `Status: Reproducing`, `Status: Confirmed`) she removes the other peer labels when one of them is assigned.
 - If you mark an issue as duplicate of another, she will remember this and will chain close and chain reopen the duplicated issues when the reference issue is closed or reopened.
 - You can configure rules for interacting with your issues. This is actually the superpower she's most proud of.
+- You can configure rules for marking your issues via comment command.
 
 Ladybug responds to a configuration file located in `.github/ladybug.yml`.
 
@@ -34,7 +35,7 @@ duplicated_issues:
   chain_reopen: true
 ```
 
-Finally, the rules for interacting with your issues can be configured through a set of conditions and actions.
+Additionaly, the rules for interacting with your issues can be configured through a set of conditions and actions.
 Better to learn from an example:
 
 ```yml
@@ -99,11 +100,35 @@ The leading `@` is NOT included in case you don't want to tag the user directly.
 Finally, the reasons to lock an issue are:
 `off-topic`, `too heated`, `resolved`, `spam`
 
+There is another setting for marking your issues via comment commands. See the next section for a full explanation.
+
 ### Commands
+
+#### `/trytask`
 
 You can comment on any issue / PR with the command `/trytask`. It accepts space separated codenames of tasks to check.
 Without parameters, all tasks will be checked.
 Ladybug will reply with the query she ran for every task, and whether or not she found the current issue / PR.
+
+#### `/mark`
+
+You can comment on any issue / PR with the command `/mark`. It accepts space separated codenames for rules of marking.
+This command requires at least one valid codename. Marking rules are defined via configuration, like this:
+
+```yml
+mark_actions:
+  wontfix: # codename of the rule
+    replace_labels: "Status: Wontfix"
+    set_state: closed
+  regression:
+    replace_labels: "Status: Confirmed"
+    set_state: open
+    comment: "Reopening this issue as a regression"
+```
+
+The same actions for scheduled tasks are available here.
+
+In this example, if you comment `/mark wontfix` on any issue or PR, Ladybug will replace all labels with "Status: Wontfix" and will close the issue.
 
 ### Final word of advice from Ladybug
 
