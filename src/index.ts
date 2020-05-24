@@ -136,7 +136,7 @@ export = (app: Application) => {
       } else {
         const executor = await buildTaskExecutor(actionSet, context);
         if (executor) {
-          executor(context.issue);
+          executor(context.payload.issue);
         }
       }
     }
