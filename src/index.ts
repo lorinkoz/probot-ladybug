@@ -20,7 +20,7 @@ interface ScheduledTasksConfig {
   [propName: string]: TaskConfig;
 }
 
-interface TaskConfig {
+interface TaskQuery {
   if_type?: "issue" | "pr";
   if_state?: "open" | "closed";
   if_created?: string;
@@ -36,6 +36,9 @@ interface TaskConfig {
   if_reviewed_by?: string;
   if_linked?: "issue" | "pr";
   if_no_linked?: "issue" | "pr";
+}
+
+interface TaskActionSet {
   add_labels?: string | string[];
   remove_labels?: string | string[];
   replace_labels?: string | string[];
@@ -45,6 +48,8 @@ interface TaskConfig {
   add_assignees?: string | string[];
   remove_assignees?: string | string[];
 }
+
+interface TaskConfig extends TaskQuery, TaskActionSet {}
 
 interface TaskResult {
   task: string;
@@ -129,8 +134,8 @@ export = (app: Application) => {
     for (let taskName in config.scheduled_tasks) {
       app.log(`Processing task ${taskName}.`);
       functions.push(async () => {
-        const q = await buildTaskQuery(taskName, context),
-          executor = await buildTaskExecutor(taskName, context);
+        const q = await buildTaskQuery(config.scheduled_tasks?.[taskName], context),
+          executor = await buildTaskExecutor(config.scheduled_tasks?.[taskName], context);
 
         if (q && executor) {
           const searchResults = await context.github.search.issuesAndPullRequests({ q });
@@ -145,14 +150,11 @@ export = (app: Application) => {
   }
 
   // Builds query for schedule task
-  async function buildTaskQuery(taskName, context) {
-    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
-      { owner, repo } = context.repo(),
+  async function buildTaskQuery(task: TaskQuery | null | undefined, context) {
+    const { owner, repo } = context.repo(),
       chunks: string[] = [`repo:${owner}/${repo}`];
 
-    if (config.scheduled_tasks?.[taskName]) {
-      const task = (config.scheduled_tasks as ScheduledTasksConfig)[taskName];
-
+    if (task) {
       if (task.if_type) {
         chunks.push(`type:${task.if_type}`);
       }
@@ -217,12 +219,10 @@ export = (app: Application) => {
     return null;
   }
 
-  async function buildTaskExecutor(taskName, context) {
-    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
-      { owner, repo } = context.repo();
+  async function buildTaskExecutor(task: TaskActionSet | null | undefined, context) {
+    const { owner, repo } = context.repo();
 
-    if (config.scheduled_tasks?.[taskName]) {
-      const task = (config.scheduled_tasks as ScheduledTasksConfig)[taskName];
+    if (task) {
       return async (issue) => {
         if (task.remove_labels) {
           const labels = issue.labels.map((x) => x.name),
