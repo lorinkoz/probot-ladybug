@@ -87,7 +87,7 @@ export = (app: Application) => {
       targetTasks = command.arguments?.split(/\s+/) || Object.keys(config.scheduled_tasks || {}),
       taskResults: TaskResult[] = [];
     for (let taskName of targetTasks) {
-      const q = await buildTaskQuery(taskName, context);
+      const q = await buildTaskQuery(config.scheduled_tasks?.[taskName], context);
 
       if (q) {
         const searchResults = await context.github.search.issuesAndPullRequests({ q }),
