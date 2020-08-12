@@ -86,7 +86,7 @@ And the available actions:
 | `set_state`        | `open` or `closed`                              |
 | `set_locked`       | `false` or one of the valid reasons (see below) |
 | `add_assignees`    | username or array of usernames                  |
-| `remove_assignees` | username or array of usernames                  |
+| `remove_assignees` | username or array of usernames or `all`         |
 
 The placeholder for your comments are:
 

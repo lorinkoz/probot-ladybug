@@ -51,7 +51,7 @@ interface TaskActionSet {
   set_state?: "open" | "closed";
   set_locked?: false | "off-topic" | "too heated" | "resolved" | "spam";
   add_assignees?: string | string[];
-  remove_assignees?: string | string[];
+  remove_assignees?: "all" | string | string[];
 }
 
 interface TaskConfig extends TaskQuery, TaskActionSet {}
@@ -333,7 +333,12 @@ export = (app: Application) => {
             owner,
             repo,
             issue_number: issue.number,
-            assignees: Array.isArray(task.remove_assignees) ? task.remove_assignees : [task.remove_assignees],
+            assignees:
+              task.remove_assignees === "all"
+                ? issue.assignees.map((x) => x.login)
+                : Array.isArray(task.remove_assignees)
+                ? task.remove_assignees
+                : [task.remove_assignees],
           });
         }
         if (task.add_assignees) {
