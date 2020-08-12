@@ -82,7 +82,7 @@ export = (app: Application) => {
     interval: 15 * 60 * 1000, // 15 minutes
   });
 
-  commands(app, "trytask", async (context, command) => {
+  commands(app, "checktask", async (context, command) => {
     const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
       targetTasks = command.arguments?.split(/\s+/) || Object.keys(config.scheduled_tasks || {}),
       taskResults: TaskResult[] = [];
@@ -117,9 +117,27 @@ export = (app: Application) => {
     } else {
       context.github.issues.createComment(
         context.issue({
-          body: "`/trytask` couldn't find any scheduled task.",
+          body: "`/checktask` couldn't find any scheduled task.",
         })
       );
+    }
+  });
+
+  commands(app, "trytask", async (context, command) => {
+    const config: AppConfig = (await context.config(configPath, defaultConfig)) as AppConfig,
+      actionSet = config.scheduled_tasks?.[command.arguments];
+
+    if (!actionSet) {
+      context.github.issues.createComment(
+        context.issue({
+          body: "`/trytask` couldn't find the target scheduled task.",
+        })
+      );
+    } else {
+      const executor = await buildTaskExecutor(actionSet, context);
+      if (executor) {
+        executor(context.payload.issue);
+      }
     }
   });
 

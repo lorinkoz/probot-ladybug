@@ -104,11 +104,16 @@ There is another setting for marking your issues via comment commands. See the n
 
 ### Commands
 
-#### `/trytask`
+#### `/checktask`
 
-You can comment on any issue / PR with the command `/trytask`. It accepts space separated codenames of tasks to check.
+You can comment on any issue / PR with the command `/checktask`. It accepts space separated codenames of tasks to check.
 Without parameters, all tasks will be checked.
 Ladybug will reply with the query she ran for every task, and whether or not she found the current issue / PR.
+
+#### `/trytask`
+
+You can comment on any issue / PR with the command `/trytask`. It accepts one codename of a tasks to try.
+Ladybug will execute the task that was passed in the current issue.
 
 #### `/mark`
 
