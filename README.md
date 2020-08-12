@@ -90,12 +90,12 @@ And the available actions:
 
 The placeholder for your comments are:
 
-| Placeholder   | Values                                               |
-| ------------- | ---------------------------------------------------- |
-| `${AUTHOR}`   | Author of the issue, NOT including the leading `@`   |
-| `${ASSIGNEE}` | Assignee of the issue, NOT including the leading `@` |
-
-The leading `@` is NOT included in case you don't want to tag the user directly.
+| Placeholder      | Values                                                  |
+| ---------------- | ------------------------------------------------------- |
+| `${AUTHOR}`      | Author of the issue, NOT including the leading `@`      |
+| `${ASSIGNEE}`    | Assignee(s) of the issue, NOT including the leading `@` |
+| `${AT_AUTHOR}`   | Author of the issue, including the leading `@`          |
+| `${AT_ASSIGNEE}` | Assignee(s) of the issue, including the leading `@`     |
 
 Finally, the reasons to lock an issue are:
 `off-topic`, `too heated`, `resolved`, `spam`

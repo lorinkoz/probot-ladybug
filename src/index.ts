@@ -288,10 +288,14 @@ export = (app: Application) => {
           });
         }
         if (task.comment) {
-          const replacements = {
-            "${AUTHOR}": issue.user.login,
-            "${ASSIGNEE}": (issue.assignee as any)?.login || "", // assignee is considered null always, why?
-          };
+          const authors = [issue.user].filter((x) => x).map((x) => x.login),
+            assignees = issue.assignees.map((x) => x.login),
+            replacements = {
+              "${AT_AUTHOR}": authors.map((x) => `@${x}`).join(" "),
+              "${AT_ASSIGNEE}": assignees.map((x) => `@${x}`).join(" "),
+              "${AUTHOR}": authors.join(" "),
+              "${ASSIGNEE}": assignees.join(" "),
+            };
           let commentBody = task.comment;
           for (let placeholder in replacements) {
             commentBody = commentBody.split(placeholder).join(replacements[placeholder]);
