@@ -112,7 +112,7 @@ Ladybug will reply with the query she ran for every task, and whether or not she
 
 #### `/trytask`
 
-You can comment on any issue / PR with the command `/trytask`. It accepts one codename of a tasks to try.
+You can comment on any issue / PR with the command `/trytask`. It accepts one codename of a task to try. The parameter is required.
 Ladybug will execute the task that was passed in the current issue.
 
 #### `/mark`
